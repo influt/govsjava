@@ -3,7 +3,6 @@ import java.io.*;
 public class HelloThreads {
 	private final static String FILE_PATH = "./resources/readme.txt";
 	private final static int BUF_SIZE = 10;
-	private final static Object LOCK_OBJ = new Object();
 	private static boolean done = false;
 
 	public static void main(String[] args) {
@@ -18,13 +17,8 @@ public class HelloThreads {
 					fileStream = new FileInputStream(FILE_PATH);
 					while ((bytesRead=fileStream.read(buf))!=-1){
 						outStream.write(buf, 0, bytesRead);
-						synchronized (LOCK_OBJ) {
-							LOCK_OBJ.wait();
-						}
 					}
 					done = true;
-				} catch(InterruptedException e){
-					e.printStackTrace();
 				} catch(IOException e){
 					e.printStackTrace();
 				} finally {
@@ -48,9 +42,6 @@ public class HelloThreads {
 				newBytes = len-offset;
 				System.out.print(new String(buf, offset, newBytes));
 				offset += newBytes;
-				synchronized (LOCK_OBJ) {
-					LOCK_OBJ.notify();
-				}
 			} while (!done || newBytes > 0);
 			outStream.close();
 		}catch(IOException e){
